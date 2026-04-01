@@ -60,6 +60,19 @@ spring:
               filters:
                 - StripPrefix=1
 
+            # --- Notification Service (/notifications/** → http://localhost:3002) ---
+            # REST API: /notifications/api/v1/**
+            # WebSocket upgrade path is handled by NLB → Socket.io directly (port 3002)
+            - id: notification-service
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:3002}
+              predicates:
+                - Path=/notifications/**
+              filters:
+                - StripPrefix=1
+                # Strip duplicate CORS headers that Express/cors middleware also adds.
+                # The gateway's globalcors is the single source of truth for CORS.
+                - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials Access-Control-Allow-Headers Access-Control-Allow-Methods, RETAIN_FIRST
+
           # ── Global default filters ────────────────────────────────
           default-filters:
             - AddResponseHeader=X-Gateway, FlowCore-Gateway
@@ -68,7 +81,7 @@ spring:
           globalcors:
             corsConfigurations:
               '[/**]':
-                allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+                allowedOriginPatterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:[*]}
                 allowedMethods:
                   - GET
                   - POST
@@ -77,7 +90,18 @@ spring:
                   - DELETE
                   - OPTIONS
                 allowedHeaders:
-                  - "*"
+                  - Authorization
+                  - Content-Type
+                  - Accept
+                  - X-Requested-With
+                  - X-Tenant-Id
+                  - X-User-Id
+                  - Cache-Control
+                exposedHeaders:
+                  - Authorization
+                  - X-Total-Count
+                  - X-Page-Number
+                  - X-Page-Size
                 allowCredentials: true
                 maxAge: 3600
 

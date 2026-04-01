@@ -16,8 +16,12 @@ public class SecurityConfig {
             "/actuator/health/**",
             "/actuator/info",
             "/platform/api/v1/tenants/resolve",
+            "/platform/api/v1/lookups",
+            "/platform/api/v1/lookups/**",
+            "/platform/api/v1/plans",
             "/tenant/api/v1/email-verification/**",
-            "/tenant/api/v1/account/signup"
+            "/tenant/api/v1/account/signup",
+            "/notifications/health"
     };
 
     @Bean
