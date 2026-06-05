@@ -60,6 +60,14 @@ spring:
               filters:
                 - StripPrefix=1
 
+            # --- Workflow Service (/workflow/** → http://localhost:8084) ---
+            - id: workflow-service
+              uri: ${WORKFLOW_SERVICE_URL:http://localhost:8084}
+              predicates:
+                - Path=/workflow/**
+              filters:
+                - StripPrefix=1
+
             # --- Notification Service (/notifications/** → http://localhost:3002) ---
             # REST API: /notifications/api/v1/**
             # WebSocket upgrade path is handled by NLB → Socket.io directly (port 3002)
